@@ -8,3 +8,12 @@ wheels/
 
 # Virtual environments
 .venv
+
+# 1. 先忽略 dataset 文件夹下的所有内容
+dataset/*
+
+# 2. 但是不要忽略 dataset/mnist.py
+!dataset/mnist.py
+
+# Jupyter
+.ipynb
