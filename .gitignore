@@ -15,3 +15,6 @@ dataset/*
 
 # Jupyter
 .ipynb
+
+pyproject.toml
+uv.lock
