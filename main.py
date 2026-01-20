@@ -1,36 +1,36 @@
+import back_propagation_network as nn
 import numpy as np
 
-import two_layer_network as nw
 from dataset.mnist import load_mnist
 
-(x_train, t_train), (x_test, t_test) = load_mnist(normalize=False, one_hot_label=True)
+(x_train, t_train), (x_test, t_test) = load_mnist(one_hot_label=True)
+
+network = nn.Network(784, 256, 10)
+
+train_size = x_train.shape[0]
+batch_size = 100
+rate = 0.5
 
 
-network = nw.Network(784, 50, 10)
-theta = 0.1
-batch = 100
+train_accuracy = []
+test_accuracy = []
+loss = []
 
-for i in range(100):
-    print(f"第{i + 1}次学习")
-    M = np.random.choice(x_train.shape[0], batch)
-    A = x_train[M]
+for i in range(6000):
+    mask = np.random.choice(train_size, 100)
+    x_batch = x_train[mask]
+    t_batch = t_train[mask]
 
-    Dw1 = network.numerical_gradient(A, t_train[M], batch)["W1"]
-    Dw2 = network.numerical_gradient(A, t_train[M], batch)["W2"]
-    Db1 = network.numerical_gradient(A, t_train[M], batch)["b1"]
-    Db2 = network.numerical_gradient(A, t_train[M], batch)["b2"]
+    grads = network.gradient(x_batch, t_batch)
+    for key in ("W1", "W2", "b1", "b2"):
+        network.params[key] -= grads[key]
 
-    network.params["W1"] -= theta * Dw1
-    network.params["W2"] -= theta * Dw2
-    network.params["b1"] -= theta * Db1
-    network.params["b2"] -= theta * Db2
+    loss.append(network.loss(x_batch, t_batch))
 
-    print(network.loss(A, t_train[M]) / batch)
+    # print(f"第{i}次学习 LOSS: {loss[i]:.5f}")
+    if i % 50 == 0:
+        train_accuracy.append(network.accuracy(x_train, t_train))
+        test_accuracy.append(network.accuracy(x_test, t_test))
 
-acc_cnt = 0
-
-y = np.sum(
-    np.array(network.predict(x_test).argmax(axis=1) - t_test.argmax(axis=1) == 0)
-)
-# 这里应为 x_test.shape[0] 会导致结果 / 784 最终训练结果为 78.4% ~ 86.24%
-print(f"accuracy: {(y / x_test.size) * 100:.2f} %")
+# for i in test_accuracy:
+#     print(f"测试正确率: {i:.4f}")

@@ -12,6 +12,8 @@ wheels/
 # Only Push dataset/minst.py
 dataset/*
 !dataset/mnist.py
+ch04/dataset/*
+!ch04/dataset/mnist.py
 
 # Jupyter
 .ipynb
